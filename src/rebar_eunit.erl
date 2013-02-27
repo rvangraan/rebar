@@ -144,10 +144,13 @@ run_eunit(Config, CodePath, SrcErls) ->
     %% eunit+cover to not slow down when analyzing many Erlang modules.
     ok = cover:stop(),
 
-    case EunitResult of
-        ok ->
+    KeepGoing = rebar_config:get_global(keep_going, false),
+    case {EunitResult, KeepGoing} of
+      {ok, _} ->
+             ok;
+      {_, true} ->
             ok;
-        _ ->
+      {_, false} ->
             ?ABORT("One or more eunit tests failed.~n", [])
     end,
 
